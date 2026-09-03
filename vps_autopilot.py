@@ -163,36 +163,41 @@ def process_video(video):
         update_video_status(video_id, "failed")
 
 def main():
-    logger.info("Iniciando Autopilot Worker (Modo Polvo - 3 Tarefas simultaneas)...")
+    logger.info("Iniciando Autopilot Worker (Esteira Continua - max 3 Tarefas)...")
     import concurrent.futures
+    
+    futures = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
         while True:
             try:
-                response = requests.get(f"{SUPABASE_URL}/rest/v1/videos?status=eq.draft&select=*&order=created_at.asc&limit=3", headers=HEADERS)
-                response.raise_for_status()
-                videos = response.json()
+                # Remove da lista as tarefas que ja terminaram
+                futures = [f for f in futures if not f.done()]
                 
-                if not videos:
-                    logger.info("Nenhum video na fila. Aguardando 10 segundos...")
-                    time.sleep(10)
-                    continue
+                vagas = 3 - len(futures)
                 
-                logger.info(f"Encontrados {len(videos)} videos na fila. Iniciando processamento em lote...")
-                
-                futures = []
-                for video in videos:
-                    update_video_status(video["id"], "processing")
-                    futures.append(executor.submit(process_video, video))
-                    time.sleep(10) # Pausa de 10s para nao dar Rate Limit na API do LLM (concurrency: 1)
+                if vagas > 0:
+                    response = requests.get(f"{SUPABASE_URL}/rest/v1/videos?status=eq.draft&select=*&order=created_at.asc&limit={vagas}", headers=HEADERS)
+                    response.raise_for_status()
+                    videos = response.json()
                     
-                concurrent.futures.wait(futures)
+                    if videos:
+                        logger.info(f"Encontrados {len(videos)} videos. Preenchendo as {vagas} vagas na esteira...")
+                        for video in videos:
+                            update_video_status(video["id"], "processing")
+                            futures.append(executor.submit(process_video, video))
+                            time.sleep(10) # Pausa de 10s para nao dar Rate Limit na API do LLM
+                    else:
+                        if len(futures) == 0:
+                            logger.info("Nenhum video na fila e esteira vazia. Aguardando 10 segundos...")
                 
             except Exception as e:
                 logger.error(f"Erro no loop principal: {e}")
-                time.sleep(10)
+                
+            time.sleep(10) # Aguarda 10s antes de verificar novamente
 
 if __name__ == "__main__":
     main()
+
 
 
 
