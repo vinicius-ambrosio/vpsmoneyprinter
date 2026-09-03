@@ -158,7 +158,7 @@ def main():
                 update_video_status(video_id, "failed")
                 continue
                 
-                        result_files = wait_for_task(task_id)
+            result_files = wait_for_task(task_id)
             if result_files and len(result_files) > 0:
                 local_file = result_files[0]
                 if local_file.startswith("/tasks/"):
@@ -180,6 +180,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
