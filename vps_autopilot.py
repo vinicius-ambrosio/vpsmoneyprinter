@@ -120,7 +120,7 @@ def upload_to_r2(local_file_path, destination_name):
         )
         # Assumindo que o acesso público ao bucket R2 esteja habilitado através de dev URL ou domínio customizado
         # Para R2 o formato padrão do R2.dev é:
-        public_url = f"https://pub-dbd5e754a6544976a47a111a1d95eb07.r2.dev/{destination_name}" # Placeholder, precisaremos ajustar
+        public_url = f"https://cdn.dragiovanna.com/{destination_name}" # Placeholder, precisaremos ajustar
         return public_url
     except Exception as e:
         logger.error(f"Erro no upload para R2: {e}")
