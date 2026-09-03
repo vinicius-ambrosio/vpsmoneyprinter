@@ -38,7 +38,7 @@ s3_client = boto3.client(
 MONEY_PRINTER_URL = "http://127.0.0.1:8080/api/v1/tasks"
 
 def get_pending_videos():
-    url = f"{SUPABASE_URL}/rest/v1/videos?status=eq.fila&select=*"
+    url = f"{SUPABASE_URL}/rest/v1/videos?status=eq.draft&select=*"
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
@@ -141,15 +141,15 @@ def main():
             script = video.get("script")
             
             if not script:
-                update_video_status(video_id, "erro")
+                update_video_status(video_id, "failed")
                 continue
                 
             logger.info(f"Processando vídeo ID: {video_id} - Título: {title}")
-            update_video_status(video_id, "processando")
+            update_video_status(video_id, "processing")
             
             task_id = generate_video(script, title)
             if not task_id:
-                update_video_status(video_id, "erro")
+                update_video_status(video_id, "failed")
                 continue
                 
             result_files = wait_for_task(task_id)
@@ -169,11 +169,11 @@ def main():
                 r2_url = upload_to_r2(local_file, filename)
                 
                 if r2_url:
-                    update_video_status(video_id, "concluido", video_url=r2_url)
+                    update_video_status(video_id, "completed", video_url=r2_url)
                 else:
-                    update_video_status(video_id, "erro")
+                    update_video_status(video_id, "failed")
             else:
-                update_video_status(video_id, "erro")
+                update_video_status(video_id, "failed")
                 
         time.sleep(5)
 
