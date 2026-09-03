@@ -158,19 +158,14 @@ def main():
                 update_video_status(video_id, "failed")
                 continue
                 
-            result_files = wait_for_task(task_id)
+                        result_files = wait_for_task(task_id)
             if result_files and len(result_files) > 0:
                 local_file = result_files[0]
-                if not local_file.startswith("/"):
-                    # O MoneyPrinter retorna o caminho relativo do arquivo em relaï¿½ï¿½o a pasta raiz.
-                    local_file = os.path.join("/MoneyPrinterTurbo", local_file)
+                if local_file.startswith("/tasks/"):
+                    local_file = local_file.replace("/tasks/", "./storage/tasks/")
+                elif not local_file.startswith("/"):
+                    local_file = os.path.join("./storage/tasks", local_file)
                 
-                # Vamos converter o caminho relativo para absoluto se rodar no host, 
-                # mas se rodar no host precisa acessar o arquivo local na pasta storage.
-                # Assumindo que roda no mesmo diretorio de MoneyPrinterTurbo
-                if not os.path.exists(local_file) and local_file.startswith("/MoneyPrinterTurbo"):
-                    local_file = local_file.replace("/MoneyPrinterTurbo/", "./")
-                    
                 filename = f"video_{video_id}_{int(time.time())}.mp4"
                 r2_url = upload_to_r2(local_file, filename)
                 
@@ -185,6 +180,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
