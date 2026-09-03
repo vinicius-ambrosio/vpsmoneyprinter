@@ -46,7 +46,7 @@ def get_pending_videos():
         response.raise_for_status()
         return response.json()
     except Exception as e:
-        logger.error(f"Erro ao buscar vï¿½deos: {e}")
+        logger.error(f"Erro ao buscar videos: {e}")
         return []
 
 def update_video_status(video_id, status, video_url=None):
@@ -58,12 +58,12 @@ def update_video_status(video_id, status, video_url=None):
     try:
         response = requests.patch(url, headers=HEADERS, json=payload)
         response.raise_for_status()
-        logger.info(f"Vï¿½deo {video_id} atualizado para status '{status}'")
+        logger.info(f"Video {video_id} atualizado para status '{status}'")
     except Exception as e:
-        logger.error(f"Erro ao atualizar status do vï¿½deo {video_id}: {e}")
+        logger.error(f"Erro ao atualizar status do video {video_id}: {e}")
 
 def generate_video(script_text, title):
-    logger.info("Enviando requisiï¿½ï¿½o de geraï¿½ï¿½o de vï¿½deo para MoneyPrinterTurbo...")
+    logger.info("Enviando requisicao de geracao de video para MoneyPrinterTurbo...")
     payload = {
         "video_subject": title,
         "video_script": script_text,
@@ -193,6 +193,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
 
 
 
