@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       model: moonshot('kimi-k2.6'),
       prompt: `Você é um especialista em criação de roteiros curtos (TikTok, Reels, Shorts).
 Crie um roteiro direto ao ponto, em formato de fala narrativa (sem marcadores de cena como [música toca] ou [câmera aproxima]), para divulgar o produto abaixo.
-O roteiro deve durar cerca de 30 a 60 segundos falando (em média 70 a 120 palavras).
+O roteiro deve durar NO M�XIMO 20 a 30 segundos (OBRIGAT�RIO: 40 a no m�ximo 60 palavras totais).
 Faça um gancho forte na primeira frase para prender a atenção do público-alvo!
 ${contextPrompt}
 
