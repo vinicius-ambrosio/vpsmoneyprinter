@@ -1101,7 +1101,7 @@ def generate_video(
         params.font_size = int(params.font_size)
         params.stroke_width = int(params.stroke_width)
         phrase = subtitle_item[1]
-        max_width = video_width * 0.9
+        max_width = video_width * 0.8
         bg_color = resolve_subtitle_background_color()
         rounded_bg_enabled = bool(
             getattr(params, "rounded_subtitle_background", False) and bg_color
