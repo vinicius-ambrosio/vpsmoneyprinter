@@ -183,6 +183,7 @@ def main():
                 for video in videos:
                     update_video_status(video["id"], "processing")
                     futures.append(executor.submit(process_video, video))
+                    time.sleep(10) # Pausa de 10s para nao dar Rate Limit na API do LLM (concurrency: 1)
                     
                 concurrent.futures.wait(futures)
                 
@@ -192,6 +193,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
