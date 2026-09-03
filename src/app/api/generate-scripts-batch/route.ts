@@ -41,7 +41,7 @@ ${topic ? `O usuário forneceu o seguinte tema ou URL de referência: "${topic}"
 O formato desejado para o vídeo é: "${format}"${brandInstruction}
 
 Sua tarefa é gerar exatamente ${maxQuantity} opção(ões) de roteiro(s) para este tema.
-Cada roteiro deve ser direto ao ponto, em formato de fala narrativa, durando NO M�XIMO 20 a 30 segundos (OBRIGAT�RIO: 40 a no m�ximo 60 palavras totais), com um gancho forte na primeira frase.${ctaInstruction}
+Cada roteiro deve ser direto ao ponto, em formato de fala narrativa, durando NO MÁXIMO 20 a 30 segundos (OBRIGATÓRIO: 40 a no máximo 60 palavras totais), com um gancho forte na primeira frase.${ctaInstruction}
 
 OBRIGATÓRIO: Retorne a resposta ESTRITAMENTE como um array JSON válido, onde cada elemento é um objeto contendo duas chaves:
 - "title": Um título curto e chamativo para a ideia (máximo 5 palavras).

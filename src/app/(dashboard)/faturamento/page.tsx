@@ -1,72 +1,84 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { CreditCard, Zap, CheckCircle2, Clock, FileText, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useCredits } from "@/components/CreditsProvider"
+import { createClient } from "@/utils/supabase/client"
 
 export default function FaturamentoPage() {
   const { credits: userCredits, isLoading } = useCredits()
   const [isPurchasing, setIsPurchasing] = useState(false)
+  const [transactions, setTransactions] = useState<any[]>([])
 
-  // Mock de transações para o histórico
-  const transactions = [
-    {
-      id: "tx_123456",
-      date: "03/09/2026",
-      plan: "Pacote Básico",
-      credits: 50,
-      amount: "R$ 47,00",
-      status: "completed"
-    },
-    {
-      id: "tx_123455",
-      date: "15/08/2026",
-      plan: "Pacote Pro",
-      credits: 200,
-      amount: "R$ 147,00",
-      status: "completed"
-    },
-    {
-      id: "tx_123454",
-      date: "01/08/2026",
-      plan: "Pacote Básico",
-      credits: 50,
-      amount: "R$ 47,00",
-      status: "failed"
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data } = await supabase
+          .from('transactions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          
+        if (data) {
+          const formatted = data.map((tx) => {
+            const date = new Date(tx.created_at)
+            let plan = "Recarga de Créditos"
+            if (tx.credits_added === 100) plan = "Pacote Básico"
+            if (tx.credits_added === 300) plan = "Pacote Pro"
+            if (tx.credits_added === 1000) plan = "Pacote Agência"
+
+            return {
+              id: tx.id,
+              date: new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date),
+              plan,
+              credits: tx.credits_added,
+              amount: `R$ ${Number(tx.amount_paid).toFixed(2).replace('.', ',')}`,
+              status: "completed"
+            }
+          })
+          setTransactions(formatted)
+        }
+      }
     }
-  ]
+    fetchTransactions()
+  }, [])
 
   const packages = [
     {
       id: "basic",
       name: "Básico",
-      credits: 50,
-      price: "R$ 47,00",
-      pricePerVideo: "R$ 0,94 por vídeo",
+      credits: 100,
+      price: "R$ 27,00",
+      pricePerVideo: "R$ 2,70 por vídeo",
       popular: false,
-      features: ["50 vídeos gerados", "Sem expiração", "Suporte padrão"]
+      features: ["10 vídeos gerados", "Sem expiração"],
+      hotmartLink: "https://pay.hotmart.com/I107458674P?off=8o4qig0r"
     },
     {
       id: "pro",
       name: "Pro",
-      credits: 200,
-      price: "R$ 147,00",
-      pricePerVideo: "R$ 0,73 por vídeo",
+      credits: 300,
+      price: "R$ 47,00",
+      pricePerVideo: "R$ 1,57 por vídeo",
       popular: true,
-      features: ["200 vídeos gerados", "Sem expiração", "Suporte prioritário"]
+      features: ["30 vídeos gerados", "Sem expiração"],
+      hotmartLink: "https://pay.hotmart.com/K107458772N?off=3gz3nmea"
     },
     {
       id: "agency",
       name: "Agência",
       credits: 1000,
-      price: "R$ 497,00",
-      pricePerVideo: "R$ 0,49 por vídeo",
+      price: "R$ 97,00",
+      pricePerVideo: "R$ 0,97 por vídeo",
       popular: false,
-      features: ["1000 vídeos gerados", "Sem expiração", "Gerente de conta"]
+      features: ["100 vídeos gerados", "Sem expiração"],
+      hotmartLink: "https://pay.hotmart.com/X107458830F?off=uh3j30ce"
     }
   ]
 
@@ -100,7 +112,7 @@ export default function FaturamentoPage() {
               <span className="text-gray-400 font-medium">créditos</span>
             </div>
             <p className="text-sm text-gray-500">
-              {isLoading ? "Carregando saldo..." : `Equivale a aprox. ${userCredits} vídeos gerados pela IA.`}
+              {isLoading ? "Carregando saldo..." : `Equivale a aprox. ${Math.floor((userCredits || 0) / 10)} vídeos gerados pela IA.`}
             </p>
           </CardContent>
         </Card>
@@ -115,7 +127,7 @@ export default function FaturamentoPage() {
                 </div>
                 <h3 className="font-semibold text-gray-900">Como funciona?</h3>
               </div>
-              <p className="text-sm text-gray-500">Cada vídeo gerado consome 1 crédito do seu saldo. Os créditos não expiram.</p>
+              <p className="text-sm text-gray-500">Cada vídeo gerado consome 10 créditos do seu saldo. Os créditos não expiram.</p>
             </CardContent>
           </Card>
           <Card className="border-gray-200 shadow-sm rounded-xl">
@@ -135,9 +147,9 @@ export default function FaturamentoPage() {
       {/* Pacotes de Créditos */}
       <div className="mb-12">
         <h2 className="text-xl font-bold tracking-tight text-gray-900 mb-6">Comprar mais créditos</h2>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6 pt-4">
           {packages.map((pkg) => (
-            <Card key={pkg.id} className={`relative flex flex-col border-gray-200 shadow-sm transition-all rounded-xl hover:border-gray-300 hover:shadow-md ${pkg.popular ? 'border-zinc-900 ring-2 ring-zinc-900/10' : ''}`}>
+            <Card key={pkg.id} className={`relative flex flex-col border-gray-200 shadow-sm transition-all rounded-xl overflow-visible hover:border-gray-300 hover:shadow-md ${pkg.popular ? 'border-zinc-900 ring-2 ring-zinc-900/10' : ''}`}>
               {pkg.popular && (
                 <div className="absolute -top-3 inset-x-0 flex justify-center">
                   <Badge className="bg-black hover:bg-zinc-800 text-white uppercase text-[10px] font-bold tracking-wider py-1 px-3">
@@ -154,7 +166,7 @@ export default function FaturamentoPage() {
                 <CardDescription className="text-gray-900 font-bold mt-2 text-lg">
                   {pkg.price}
                 </CardDescription>
-                <p className="text-xs text-gray-400 mt-1">{pkg.pricePerVideo}</p>
+                <p className="text-sm font-medium text-gray-500 mt-1">{pkg.pricePerVideo}</p>
               </CardHeader>
               <CardContent className="flex-1">
                 <ul className="space-y-3 text-sm text-gray-600 mt-4">

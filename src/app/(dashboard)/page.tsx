@@ -47,7 +47,7 @@ const SELECT_LABELS: Record<string, string> = {
 export default function GeneradorPage() {
   const router = useRouter()
   const supabase = createClient()
-  const { credits, isLoading } = useCredits()
+  const { credits, isLoading, refreshCredits } = useCredits()
   
   const [currentStep, setCurrentStep] = useState(1)
   
@@ -171,6 +171,14 @@ export default function GeneradorPage() {
           script: option.script,
           style: 'pexels',
           status: 'draft',
+          voice_id: voz,
+          voice_speed: parseFloat(velocidade),
+          subtitle_position: posicaoLegenda,
+          subtitle_font: fonte,
+          subtitle_color: corTexto,
+          subtitle_bg_color: corFundo,
+          bgm_volume: bgmVolume[0],
+          broll_mode: 'auto',
         };
       });
 

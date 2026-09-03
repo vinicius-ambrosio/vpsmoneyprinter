@@ -1,4 +1,4 @@
-import { Download, Clock, Loader2, CheckCircle2, Play, Trash2, VideoIcon } from "lucide-react"
+﻿import { Download, Clock, Loader2, CheckCircle2, Play, Trash2, VideoIcon, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -10,6 +10,8 @@ import {
   TableBody
 } from "@/components/ui/table"
 import { createClient } from "@/utils/supabase/server"
+import { DeleteVideoButton } from "@/components/DeleteVideoButton"
+import { RetryVideoButton } from "@/components/RetryVideoButton"
 
 export default async function HistoricoPage() {
   const supabase = await createClient()
@@ -41,8 +43,8 @@ export default async function HistoricoPage() {
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Meus Vídeos</h1>
-        <p className="text-gray-500 mt-2">Acompanhe a fila de processamento e baixe seus vídeos prontos.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Meus VÃ­deos</h1>
+        <p className="text-gray-500 mt-2">Acompanhe a fila de processamento e baixe seus vÃ­deos prontos.</p>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -53,7 +55,7 @@ export default async function HistoricoPage() {
               <TableHead className="text-gray-600 font-semibold">Estilo</TableHead>
               <TableHead className="text-gray-600 font-semibold">Data</TableHead>
               <TableHead className="text-gray-600 font-semibold">Status</TableHead>
-              <TableHead className="text-right text-gray-600 font-semibold">Ações</TableHead>
+              <TableHead className="text-right text-gray-600 font-semibold">AÃ§Ãµes</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -61,7 +63,7 @@ export default async function HistoricoPage() {
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-12 text-gray-500">
                   <VideoIcon className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                  Nenhum vídeo criado ainda. Vá para a página inicial para gerar seu primeiro gancho!
+                  Nenhum vÃ­deo criado ainda. VÃ¡ para a pÃ¡gina inicial para gerar seu primeiro gancho!
                 </TableCell>
               </TableRow>
             ) : (
@@ -76,7 +78,7 @@ export default async function HistoricoPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm text-gray-500 capitalize">{video.style || 'Automático'}</span>
+                    <span className="text-sm text-gray-500 capitalize">{video.style || 'AutomÃ¡tico'}</span>
                   </TableCell>
                   <TableCell>
                     <span className="text-sm text-gray-500">{formatData(video.created_at)}</span>
@@ -92,7 +94,12 @@ export default async function HistoricoPage() {
                         <Loader2 className="h-3.5 w-3.5 animate-spin" /> Gerando
                       </Badge>
                     )}
-                    {(video.status === "draft" || !video.status) && (
+                                          {video.status === "failed" && (
+                        <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-red-200 gap-1.5 font-medium">
+                          <XCircle className="h-3.5 w-3.5" /> Falhou
+                        </Badge>
+                      )}
+                      {(video.status === "draft" || !video.status) && (
                       <Badge className="bg-gray-100 text-gray-600 hover:bg-gray-100 border-gray-200 gap-1.5 font-medium">
                         <Clock className="h-3.5 w-3.5" /> Na Fila
                       </Badge>
@@ -100,12 +107,21 @@ export default async function HistoricoPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" className="text-gray-400 hover:text-black hover:bg-gray-100" disabled={video.status !== 'pronto'}>
-                        <Download className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="text-gray-400 hover:text-red-600 hover:bg-red-50">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      {video.status === 'completed' && video.video_url ? (
+                        <a href={`/api/download?url=${encodeURIComponent(video.video_url)}&filename=${encodeURIComponent(video.title || 'video')}`} download>
+                          <Button type="button" variant="ghost" size="icon" className="text-gray-400 hover:text-black hover:bg-gray-100">
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </a>
+                      ) : (
+                        <Button variant="ghost" size="icon" className="text-gray-400 hover:text-black hover:bg-gray-100" disabled>
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      )}
+                                              {video.status === 'failed' && (
+                          <RetryVideoButton videoId={video.id} />
+                        )}
+                        <DeleteVideoButton videoId={video.id} />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -117,3 +133,4 @@ export default async function HistoricoPage() {
     </div>
   )
 }
+
