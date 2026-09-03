@@ -132,54 +132,67 @@ def upload_to_r2(local_file_path, destination_name):
         logger.error(f"Erro no upload para R2: {e}")
         return None
 
+def process_video(video):
+    video_id = video["id"]
+    script = video["script"]
+    title = video["title"]
+
+    logger.info(f"Processando video ID: {video_id} - Titulo: {title}")
+    
+    task_id = generate_video(script, title)
+    if not task_id:
+        update_video_status(video_id, "failed")
+        return
+        
+    result_files = wait_for_task(task_id)
+    if result_files and len(result_files) > 0:
+        local_file = result_files[0]
+        if local_file.startswith("/tasks/"):
+            local_file = local_file.replace("/tasks/", "./storage/tasks/")
+        elif not local_file.startswith("/"):
+            local_file = os.path.join("./storage/tasks", local_file)
+        
+        filename = f"video_{video_id}_{int(time.time())}.mp4"
+        r2_url = upload_to_r2(local_file, filename)
+        
+        if r2_url:
+            update_video_status(video_id, "completed", video_url=r2_url)
+        else:
+            update_video_status(video_id, "failed")
+    else:
+        update_video_status(video_id, "failed")
+
 def main():
-    logger.info("Iniciando Autopilot Worker...")
-    while True:
-        videos = get_pending_videos()
-        if not videos:
-            logger.info("Nenhum vï¿½deo na fila. Aguardando 10 segundos...")
-            time.sleep(10)
-            continue
-            
-        for video in videos:
-            video_id = video.get("id")
-            title = video.get("title", "Video Curto")
-            script = video.get("script")
-            
-            if not script:
-                update_video_status(video_id, "failed")
-                continue
+    logger.info("Iniciando Autopilot Worker (Modo Polvo - 3 Tarefas simultaneas)...")
+    import concurrent.futures
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        while True:
+            try:
+                response = requests.get(f"{SUPABASE_URL}/rest/v1/videos?status=eq.draft&select=*&limit=3", headers=HEADERS)
+                response.raise_for_status()
+                videos = response.json()
                 
-            logger.info(f"Processando vï¿½deo ID: {video_id} - Tï¿½tulo: {title}")
-            update_video_status(video_id, "processing")
-            
-            task_id = generate_video(script, title)
-            if not task_id:
-                update_video_status(video_id, "failed")
-                continue
+                if not videos:
+                    logger.info("Nenhum video na fila. Aguardando 10 segundos...")
+                    time.sleep(10)
+                    continue
                 
-            result_files = wait_for_task(task_id)
-            if result_files and len(result_files) > 0:
-                local_file = result_files[0]
-                if local_file.startswith("/tasks/"):
-                    local_file = local_file.replace("/tasks/", "./storage/tasks/")
-                elif not local_file.startswith("/"):
-                    local_file = os.path.join("./storage/tasks", local_file)
+                logger.info(f"Encontrados {len(videos)} videos na fila. Iniciando processamento em lote...")
                 
-                filename = f"video_{video_id}_{int(time.time())}.mp4"
-                r2_url = upload_to_r2(local_file, filename)
+                futures = []
+                for video in videos:
+                    update_video_status(video["id"], "processing")
+                    futures.append(executor.submit(process_video, video))
+                    
+                concurrent.futures.wait(futures)
                 
-                if r2_url:
-                    update_video_status(video_id, "completed", video_url=r2_url)
-                else:
-                    update_video_status(video_id, "failed")
-            else:
-                update_video_status(video_id, "failed")
-                
-        time.sleep(5)
+            except Exception as e:
+                logger.error(f"Erro no loop principal: {e}")
+                time.sleep(10)
 
 if __name__ == "__main__":
     main()
+
 
 
 
