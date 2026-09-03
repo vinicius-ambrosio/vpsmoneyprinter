@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import os
 import json
 import time
@@ -10,7 +10,7 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Configura��es do Supabase
+# Configuraï¿½ï¿½es do Supabase
 SUPABASE_URL = "http://169.58.106.34:8000"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
 HEADERS = {
@@ -20,7 +20,7 @@ HEADERS = {
     "Prefer": "return=representation"
 }
 
-# Configura��es do Cloudflare R2
+# Configuraï¿½ï¿½es do Cloudflare R2
 R2_ACCESS_KEY = "ae7cccdb6cba3b1e53b20d7beaf0ac63"
 R2_SECRET_KEY = "b7b93c2abe6e851e7adad9eff8d7df6414ab373206b3d169b1615ba2d810ae6f"
 R2_ENDPOINT = "https://ead4aafca17719a0ed9999a1644aa88e.r2.cloudflarestorage.com"
@@ -46,7 +46,7 @@ def get_pending_videos():
         response.raise_for_status()
         return response.json()
     except Exception as e:
-        logger.error(f"Erro ao buscar v�deos: {e}")
+        logger.error(f"Erro ao buscar vï¿½deos: {e}")
         return []
 
 def update_video_status(video_id, status, video_url=None):
@@ -58,12 +58,12 @@ def update_video_status(video_id, status, video_url=None):
     try:
         response = requests.patch(url, headers=HEADERS, json=payload)
         response.raise_for_status()
-        logger.info(f"V�deo {video_id} atualizado para status '{status}'")
+        logger.info(f"Vï¿½deo {video_id} atualizado para status '{status}'")
     except Exception as e:
-        logger.error(f"Erro ao atualizar status do v�deo {video_id}: {e}")
+        logger.error(f"Erro ao atualizar status do vï¿½deo {video_id}: {e}")
 
 def generate_video(script_text, title):
-    logger.info("Enviando requisi��o de gera��o de v�deo para MoneyPrinterTurbo...")
+    logger.info("Enviando requisiï¿½ï¿½o de geraï¿½ï¿½o de vï¿½deo para MoneyPrinterTurbo...")
     payload = {
         "video_subject": title,
         "video_script": script_text,
@@ -92,21 +92,23 @@ def generate_video(script_text, title):
 
 def wait_for_task(task_id):
     url = f"{MONEY_PRINTER_API_TASKS}/{task_id}"
-    logger.info(f"Aguardando a conclus�o da tarefa {task_id}...")
+    logger.info(f"Aguardando a conclusao da tarefa {task_id}...")
     while True:
         try:
             response = requests.get(url)
             response.raise_for_status()
             data = response.json().get("data", {})
             state = data.get("state")
-            if state == 1:
-                logger.info(f"Tarefa {task_id} em andamento ({data.get('progress', 0)}%)...")
+            progress = data.get("progress", 0)
+            videos = data.get("videos") or data.get("video_urls", [])
+            if state == 2 or (state == 1 and progress == 100 and videos):
+                logger.info(f"Tarefa {task_id} concluida com sucesso!")
+                return videos
             elif state == -1:
                 logger.error(f"Tarefa {task_id} falhou!")
                 return None
-            elif state == 2:
-                logger.info(f"Tarefa {task_id} conclu�da com sucesso!")
-                return data.get("video_urls", [])
+            elif state == 1:
+                logger.info(f"Tarefa {task_id} em andamento ({progress}%)...")
         except Exception as e:
             logger.error(f"Erro ao consultar status da tarefa {task_id}: {e}")
         time.sleep(10)
@@ -120,8 +122,8 @@ def upload_to_r2(local_file_path, destination_name):
             destination_name,
             ExtraArgs={'ContentType': 'video/mp4'}
         )
-        # Assumindo que o acesso p�blico ao bucket R2 esteja habilitado atrav�s de dev URL ou dom�nio customizado
-        # Para R2 o formato padr�o do R2.dev �:
+        # Assumindo que o acesso pï¿½blico ao bucket R2 esteja habilitado atravï¿½s de dev URL ou domï¿½nio customizado
+        # Para R2 o formato padrï¿½o do R2.dev ï¿½:
         public_url = f"https://cdn.dragiovanna.com/{destination_name}" # Placeholder, precisaremos ajustar
         return public_url
     except Exception as e:
@@ -133,7 +135,7 @@ def main():
     while True:
         videos = get_pending_videos()
         if not videos:
-            logger.info("Nenhum v�deo na fila. Aguardando 10 segundos...")
+            logger.info("Nenhum vï¿½deo na fila. Aguardando 10 segundos...")
             time.sleep(10)
             continue
             
@@ -146,7 +148,7 @@ def main():
                 update_video_status(video_id, "failed")
                 continue
                 
-            logger.info(f"Processando v�deo ID: {video_id} - T�tulo: {title}")
+            logger.info(f"Processando vï¿½deo ID: {video_id} - Tï¿½tulo: {title}")
             update_video_status(video_id, "processing")
             
             task_id = generate_video(script, title)
@@ -158,7 +160,7 @@ def main():
             if result_files and len(result_files) > 0:
                 local_file = result_files[0]
                 if not local_file.startswith("/"):
-                    # O MoneyPrinter retorna o caminho relativo do arquivo em rela��o a pasta raiz.
+                    # O MoneyPrinter retorna o caminho relativo do arquivo em relaï¿½ï¿½o a pasta raiz.
                     local_file = os.path.join("/MoneyPrinterTurbo", local_file)
                 
                 # Vamos converter o caminho relativo para absoluto se rodar no host, 
@@ -181,4 +183,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
