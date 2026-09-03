@@ -20,9 +20,15 @@ export async function POST(req: Request) {
       apiKey: process.env.MOONSHOT_API_KEY,
     });
 
-    let targetUrl = url;
-    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+    let targetUrl = url.trim();
+    if (!targetUrl.match(/^https?:\/\//i)) {
       targetUrl = 'https://' + targetUrl;
+    }
+
+    try {
+      new URL(targetUrl);
+    } catch (e) {
+      return NextResponse.json({ error: 'Formato de URL inválido.' }, { status: 400 });
     }
 
     let textContent = '';
@@ -78,6 +84,10 @@ Roteiro final (apenas o que será falado):`
 
     return NextResponse.json({ text: generatedScript.trim() });
   } catch (error: any) {
+    const errorString = error?.message?.toLowerCase() || '';
+    if (errorString.includes('429') || errorString.includes('rate limit') || errorString.includes('concurrency') || errorString.includes('too many requests') || errorString.includes('quota')) {
+      return NextResponse.json({ error: 'RATE_LIMIT' }, { status: 429 });
+    }
     return NextResponse.json({ error: error.message || 'Erro ao ler site' }, { status: 500 });
   }
 }

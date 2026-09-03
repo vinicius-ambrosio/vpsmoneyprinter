@@ -56,8 +56,8 @@ export default async function LoginPage({
             <span>Design System Premium</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="#" className="hover:text-white transition-colors">Termos</Link>
-            <Link href="#" className="hover:text-white transition-colors">Privacidade</Link>
+            <Link href="/termos" className="hover:text-white transition-colors">Termos</Link>
+            <Link href="/privacidade" className="hover:text-white transition-colors">Privacidade</Link>
           </div>
         </div>
       </div>
@@ -85,16 +85,16 @@ export default async function LoginPage({
           </div>
 
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="flex w-full bg-gray-100 p-1 rounded-xl mb-8 h-12">
+            <TabsList className="flex w-full border-b border-gray-200 mb-8 rounded-none p-0 h-12 bg-transparent">
               <TabsTrigger 
                 value="login" 
-                className="flex-1 rounded-lg text-sm font-semibold transition-all data-active:bg-white data-active:text-gray-900 data-active:shadow-sm text-gray-500 h-full border-none ring-0 outline-none"
+                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-black data-[state=active]:text-black text-gray-500 text-sm font-semibold data-[state=active]:bg-transparent data-[state=active]:shadow-none transition-all px-0 py-3 ring-0 outline-none"
               >
                 Entrar
               </TabsTrigger>
               <TabsTrigger 
                 value="register" 
-                className="flex-1 rounded-lg text-sm font-semibold transition-all data-active:bg-white data-active:text-gray-900 data-active:shadow-sm text-gray-500 h-full border-none ring-0 outline-none"
+                className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-black data-[state=active]:text-black text-gray-500 text-sm font-semibold data-[state=active]:bg-transparent data-[state=active]:shadow-none transition-all px-0 py-3 ring-0 outline-none"
               >
                 Criar Conta
               </TabsTrigger>
@@ -186,9 +186,9 @@ export default async function LoginPage({
                 
                 <p className="text-center text-sm text-gray-500 mt-6 font-medium">
                   Ao se cadastrar, você concorda com nossos{' '}
-                  <Link href="#" className="text-black underline-offset-4 hover:underline transition-all">Termos</Link>
+                  <Link href="/termos" className="text-black underline-offset-4 hover:underline transition-all">Termos</Link>
                   {' '}e{' '}
-                  <Link href="#" className="text-black underline-offset-4 hover:underline transition-all">Privacidade</Link>.
+                  <Link href="/privacidade" className="text-black underline-offset-4 hover:underline transition-all">Privacidade</Link>.
                 </p>
               </form>
             </TabsContent>

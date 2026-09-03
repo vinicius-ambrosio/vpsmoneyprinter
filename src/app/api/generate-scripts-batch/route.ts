@@ -70,8 +70,11 @@ Exemplo do formato esperado:
     }
 
     return NextResponse.json({ scripts: jsonResult });
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Erro ao gerar scripts';
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+  } catch (error: any) {
+    const errorString = error?.message?.toLowerCase() || '';
+    if (errorString.includes('429') || errorString.includes('rate limit') || errorString.includes('concurrency') || errorString.includes('too many requests') || errorString.includes('quota')) {
+      return NextResponse.json({ error: 'RATE_LIMIT' }, { status: 429 });
+    }
+    return NextResponse.json({ error: error.message || 'Erro interno.' }, { status: 500 });
   }
 }

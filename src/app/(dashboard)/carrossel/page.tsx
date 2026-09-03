@@ -46,20 +46,44 @@ export default function CarrosselPage() {
       const savedContext = localStorage.getItem("brandContext");
       const brandContext = savedContext ? JSON.parse(savedContext) : null;
 
-      const res = await fetch('/api/read-site', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: urlIndividual, brandContext })
-      });
-      const data = await res.json();
-      
-      if (res.ok && data.text) {
-        setPrompt(data.text);
-      } else {
-        alert(data.error || "Erro ao ler site");
+      let retries = 0;
+      const maxRetries = 6;
+      let delay = 3000;
+
+      while (retries <= maxRetries) {
+        try {
+          const res = await fetch('/api/read-site', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: urlIndividual, brandContext })
+          });
+          const data = await res.json();
+          
+          if (res.ok && data.text) {
+            setPrompt(data.text);
+            break;
+          } else {
+            if (data.error === 'RATE_LIMIT' || res.status === 429) {
+              if (retries < maxRetries) {
+                retries++;
+                await new Promise(r => setTimeout(r, delay));
+                delay += 2000;
+                continue;
+              } else {
+                alert("A IA está muito congestionada no momento (muitos acessos simultâneos). Tente novamente daqui a pouco.");
+                break;
+              }
+            }
+            alert(data.error || "Erro ao ler site");
+            break;
+          }
+        } catch (err) {
+          alert("Erro na conexão com a API.");
+          break;
+        }
       }
-    } catch (error) {
-      alert("Erro ao conectar com a API");
+    } catch {
+      alert("Erro ao ler site");
     } finally {
       setIsReadingSite(false);
     }

@@ -34,6 +34,10 @@ Roteiro final (apenas o que será falado):`
 
     return NextResponse.json({ text: generatedScript.trim() });
   } catch (error: any) {
+    const errorString = error?.message?.toLowerCase() || '';
+    if (errorString.includes('429') || errorString.includes('rate limit') || errorString.includes('concurrency') || errorString.includes('too many requests') || errorString.includes('quota')) {
+      return NextResponse.json({ error: 'RATE_LIMIT' }, { status: 429 });
+    }
     return NextResponse.json({ error: error.message || 'Erro ao gerar script' }, { status: 500 });
   }
 }

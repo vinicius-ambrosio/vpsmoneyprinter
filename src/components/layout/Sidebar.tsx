@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, PlaySquare, Settings, CreditCard, Sparkles, HelpCircle, MessageSquare, Layers, LogOut, Images } from "lucide-react"
+import { LayoutDashboard, PlaySquare, Settings, CreditCard, Sparkles, HelpCircle, MessageSquare, Layers, LogOut, Images, Lock } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { logout } from "@/app/(auth)/login/actions"
 import { useCredits } from "@/components/CreditsProvider"
@@ -36,18 +36,16 @@ export function Sidebar() {
 
 
 
-        <Link
-          href="/carrossel"
-          className={cn(
-            "flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium transition-colors",
-            pathname === "/carrossel" ? "bg-gray-100 text-gray-900" : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-          )}
+        <div
+          className="flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50/50 cursor-not-allowed opacity-60"
+          title="Funcionalidade em breve"
         >
           <div className="flex items-center gap-3">
-            <Images className={cn("h-4 w-4", pathname === "/carrossel" ? "text-gray-900" : "text-gray-400")} />
+            <Images className="h-4 w-4 text-gray-400" />
             Carrossel
           </div>
-        </Link>
+          <Lock className="h-3.5 w-3.5 text-gray-400" />
+        </div>
         
         <Link
           href="/historico"
@@ -91,12 +89,12 @@ export function Sidebar() {
 
       <div className="p-3 mt-auto">
         <nav className="space-y-1 mb-3 px-3">
-          <Link href="#" className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+          <a href="https://wa.me/5562993859686?text=Olá,%20preciso%20de%20ajuda%20com%20o%20Hookify!" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
             <HelpCircle className="h-4 w-4 text-gray-400" /> Suporte
-          </Link>
-          <Link href="#" className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+          </a>
+          <a href="https://wa.me/5562993859686?text=Olá,%20tenho%20um%20feedback%20sobre%20o%20Hookify!" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
             <MessageSquare className="h-4 w-4 text-gray-400" /> Feedback
-          </Link>
+          </a>
           <form action={logout}>
             <button type="submit" className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors">
               <LogOut className="h-4 w-4 text-gray-400 group-hover:text-red-500" /> Sair

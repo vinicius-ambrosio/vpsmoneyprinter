@@ -102,7 +102,7 @@ export default function FaturamentoPage() {
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto w-full">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Faturamento e Créditos</h1>
         <p className="text-gray-500 mt-2">Gerencie seu saldo, compre novos pacotes e veja o histórico de transações.</p>
@@ -148,7 +148,7 @@ export default function FaturamentoPage() {
                 </div>
                 <h3 className="font-semibold text-gray-900">Pagamento Seguro</h3>
               </div>
-              <p className="text-sm text-gray-500">Aceitamos Pix e os principais cartões de crédito via Stripe.</p>
+              <p className="text-sm text-gray-500">Aceitamos Pix e os principais cartões de crédito via Hotmart.</p>
             </CardContent>
           </Card>
         </div>
@@ -176,7 +176,11 @@ export default function FaturamentoPage() {
                 <CardDescription className="text-gray-900 font-bold mt-2 text-lg">
                   {pkg.price}
                 </CardDescription>
-                <p className="text-sm font-medium text-gray-500 mt-1">{pkg.pricePerVideo}</p>
+                <div className="mt-3 flex justify-center">
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-sm font-semibold px-3 py-1">
+                    {pkg.pricePerVideo}
+                  </Badge>
+                </div>
               </CardHeader>
               <CardContent className="flex-1">
                 <ul className="space-y-3 text-sm text-gray-600 mt-4">
@@ -217,33 +221,41 @@ export default function FaturamentoPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {transactions.map((tx) => (
-                <TableRow key={tx.id} className="border-gray-100">
-                  <TableCell className="text-gray-500 font-medium">{tx.date}</TableCell>
-                  <TableCell>
-                    <div className="font-medium text-gray-900">{tx.plan}</div>
-                    <div className="text-xs text-gray-500">+{tx.credits} créditos</div>
-                  </TableCell>
-                  <TableCell className="font-medium text-gray-900">{tx.amount}</TableCell>
-                  <TableCell>
-                    {tx.status === 'completed' ? (
-                      <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200 font-medium">
-                        Concluído
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="bg-red-100 text-red-700 hover:bg-red-100 border-red-200 font-medium">
-                        Falhou
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" className="h-8 text-gray-700 hover:text-black hover:bg-gray-100" disabled={tx.status !== 'completed'}>
-                      <FileText className="h-4 w-4 mr-2" />
-                      Recibo
-                    </Button>
+              {transactions.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-12 text-gray-500">
+                    Nenhuma transação encontrada no seu histórico.
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                transactions.map((tx) => (
+                  <TableRow key={tx.id} className="border-100 hover:bg-gray-50/50">
+                    <TableCell className="text-gray-500 font-medium">{tx.date}</TableCell>
+                    <TableCell>
+                      <div className="font-medium text-gray-900">{tx.plan}</div>
+                      <div className="text-xs text-gray-500">+{tx.credits} créditos</div>
+                    </TableCell>
+                    <TableCell className="font-medium text-gray-900">{tx.amount}</TableCell>
+                    <TableCell>
+                      {tx.status === 'completed' ? (
+                        <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200 font-medium">
+                          Concluído
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="bg-red-100 text-red-700 hover:bg-red-100 border-red-200 font-medium">
+                          Falhou
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="sm" className="h-8 text-gray-700 hover:text-black hover:bg-gray-100" disabled={tx.status !== 'completed'}>
+                        <FileText className="h-4 w-4 mr-2" />
+                        Recibo
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </Card>

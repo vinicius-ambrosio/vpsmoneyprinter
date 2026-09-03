@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { Loader2, Wand2, CheckCircle, Circle, ArrowLeft, ArrowRight, Link2, Building2, Type } from "lucide-react"
@@ -19,29 +19,29 @@ import { produceVideos } from "@/app/actions"
 const SELECT_LABELS: Record<string, string> = {
   "curiosidades": "Curiosidades",
   "top5": "Top 5 / Lista",
-  "polemica": "Polêmica / Opinião Forte",
-  "dicas": "Dicas Práticas",
-  "historia": "História de Sucesso",
-  "conspiracao": "Teoria da Conspiração",
+  "polemica": "PolÃªmica / OpiniÃ£o Forte",
+  "dicas": "Dicas PrÃ¡ticas",
+  "historia": "HistÃ³ria de Sucesso",
+  "conspiracao": "Teoria da ConspiraÃ§Ã£o",
   "1": "1 Roteiro",
   "2": "2 Roteiros",
   "3": "3 Roteiros",
   "4": "4 Roteiros",
   "5": "5 Roteiros",
-  "pt-BR-AntonioNeural": "Antônio (Masculino - Forte/Grave)",
-  "pt-BR-JulioNeural": "Júlio (Masculino - Jovem)",
-  "pt-BR-FranciscaNeural": "Francisca (Feminina - Enérgica)",
+  "pt-BR-AntonioNeural": "AntÃ´nio (Masculino - Forte/Grave)",
+  "pt-BR-JulioNeural": "JÃºlio (Masculino - Jovem)",
+  "pt-BR-FranciscaNeural": "Francisca (Feminina - EnÃ©rgica)",
   "pt-BR-ThalitaNeural": "Thalita (Feminina - Suave)",
   "0.9": "Lento (0.9x)",
   "1.0": "Normal (1.0x)",
-  "1.15": "Dinâmico (1.15x)",
-  "1.3": "Muito Rápido (1.3x)",
-  "Roboto-Black": "Roboto Black (Padrão Tiktok)",
+  "1.15": "DinÃ¢mico (1.15x)",
+  "1.3": "Muito RÃ¡pido (1.3x)",
+  "Roboto-Black": "Roboto Black (PadrÃ£o Tiktok)",
   "Montserrat-Bold": "Montserrat Bold",
-  "Impact": "Impact (Meme clássico)",
+  "Impact": "Impact (Meme clÃ¡ssico)",
   "top": "Topo",
   "center": "Centro",
-  "bottom": "Rodapé"
+  "bottom": "RodapÃ©"
 }
 
 export default function GeneradorPage() {
@@ -79,7 +79,7 @@ export default function GeneradorPage() {
 
   const handleGerarLote = async () => {
     if ((sourceType === "link" || sourceType === "tema") && !topic) {
-      alert(sourceType === "link" ? "Insira um link de referência!" : "Escreva um tema!");
+      alert(sourceType === "link" ? "Insira um link de referÃªncia!" : "Escreva um tema!");
       return;
     }
 
@@ -101,31 +101,51 @@ export default function GeneradorPage() {
             preco: data.price
           };
         } else {
-          alert("Nenhuma configuração de marca encontrada. Configure primeiro em Configurações > Branding.");
+          alert("Nenhuma configuraÃ§Ã£o de marca encontrada. Configure primeiro em ConfiguraÃ§Ãµes > Branding.");
           setIsGeneratingBatch(false);
           return;
         }
       }
 
-      const res = await fetch('/api/generate-scripts-batch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, format, quantity, cta: hasCta ? cta : "", brandContext: brandContextData })
-      });
-      const data = await res.json();
-      
-      if (res.ok && data.scripts) {
-        setGeneratedOptions(data.scripts);
-        setCurrentStep(2); // Auto advance to next step
-      } else {
-        let errorMsg = data.error || "Erro ao gerar roteiros";
-        if (typeof errorMsg === 'string' && errorMsg.includes('Quota exceeded')) {
-          errorMsg = 'A IA está sobrecarregada no momento (limite atingido). Tente novamente em alguns minutos.';
+      let retries = 0;
+      const maxRetries = 6;
+      let delay = 3000;
+
+      while (retries <= maxRetries) {
+        try {
+          const res = await fetch('/api/generate-scripts-batch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ topic, format, quantity, cta: hasCta ? cta : "", brandContext: brandContextData })
+          });
+          const data = await res.json();
+          
+          if (res.ok && data.scripts) {
+            setGeneratedOptions(data.scripts);
+            setCurrentStep(2); // Auto advance to next step
+            break;
+          } else {
+            if (data.error === 'RATE_LIMIT' || res.status === 429) {
+              if (retries < maxRetries) {
+                retries++;
+                await new Promise(r => setTimeout(r, delay));
+                delay += 2000;
+                continue;
+              } else {
+                alert("A IA estÃ¡ muito congestionada no momento (muitos acessos simultÃ¢neos). Tente novamente daqui a pouco.");
+                break;
+              }
+            }
+            alert(data.error || "Erro ao gerar roteiros");
+            break;
+          }
+        } catch (err) {
+          alert("Erro ao conectar com a API");
+          break;
         }
-        alert(errorMsg);
       }
     } catch {
-      alert("Erro ao conectar com a API");
+      alert("Erro ao validar configuraÃ§Ãµes.");
     } finally {
       setIsGeneratingBatch(false);
     }
@@ -155,7 +175,7 @@ export default function GeneradorPage() {
 
     const totalCost = selectedScripts.length * 10;
     if (credits < totalCost) {
-      alert(`Saldo insuficiente. Você precisa de ${totalCost} créditos.`);
+      alert(`Saldo insuficiente. VocÃª precisa de ${totalCost} crÃ©ditos.`);
       return;
     }
 
@@ -188,11 +208,11 @@ export default function GeneradorPage() {
         await refreshCredits();
         router.push('/historico');
       } else {
-        alert(res.error || "Erro ao salvar vídeos");
+        alert(res.error || "Erro ao salvar vÃ­deos");
         setIsFilaLoading(false);
       }
     } else {
-      alert("Usuário não autenticado");
+      alert("UsuÃ¡rio nÃ£o autenticado");
       setIsFilaLoading(false);
     }
   }
@@ -206,8 +226,8 @@ export default function GeneradorPage() {
               <Wand2 className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900 tracking-tight">Assistente de Criação</h1>
-              <p className="text-xs text-gray-500 font-medium mt-0.5">Siga os passos para gerar e produzir vídeos de alta conversão.</p>
+              <h1 className="text-xl font-bold text-gray-900 tracking-tight">Assistente de CriaÃ§Ã£o</h1>
+              <p className="text-xs text-gray-500 font-medium mt-0.5">Siga os passos para gerar e produzir vÃ­deos de alta conversÃ£o.</p>
             </div>
           </div>
           
@@ -228,7 +248,7 @@ export default function GeneradorPage() {
                     {stepNum}
                   </div>
                   <span className={`absolute top-10 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${currentStep >= stepNum ? 'text-zinc-900' : 'text-gray-500'}`}>
-                    {stepNum === 1 ? 'Ideias' : stepNum === 2 ? 'Seleção' : 'Produção'}
+                    {stepNum === 1 ? 'Ideias' : stepNum === 2 ? 'SeleÃ§Ã£o' : 'ProduÃ§Ã£o'}
                   </span>
                 </div>
 
@@ -250,12 +270,12 @@ export default function GeneradorPage() {
               <div className="h-1.5 w-full bg-zinc-900"></div>
               <CardHeader className="pb-5 border-b border-gray-100 bg-gray-50/50">
                 <CardTitle className="text-xl text-gray-900">1. Tema e Formato</CardTitle>
-                <CardDescription className="text-base text-gray-500 mt-1">Forneça um contexto para a IA criar as opções.</CardDescription>
+                <CardDescription className="text-base text-gray-500 mt-1">ForneÃ§a um contexto para a IA criar as opÃ§Ãµes.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-5 pt-6 pb-6 px-6">
                 
                 <div className="space-y-3">
-                  <Label className="text-gray-900 font-semibold text-sm">Fonte do Conteúdo</Label>
+                  <Label className="text-gray-900 font-semibold text-sm">Fonte do ConteÃºdo</Label>
                   <div className="grid grid-cols-3 gap-3">
                     <div 
                       className={`border-2 rounded-xl p-3 cursor-pointer transition-all flex items-center justify-center gap-2 ${sourceType === 'link' ? 'border-zinc-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
@@ -285,9 +305,9 @@ export default function GeneradorPage() {
 
                 {(sourceType === 'link' || sourceType === 'tema') && (
                   <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <Label className="text-gray-900 font-semibold text-sm">{sourceType === 'link' ? 'Link de Referência' : 'Tema do Vídeo'}</Label>
+                    <Label className="text-gray-900 font-semibold text-sm">{sourceType === 'link' ? 'Link de ReferÃªncia' : 'Tema do VÃ­deo'}</Label>
                     <Input 
-                      placeholder={sourceType === 'link' ? "Ex: https://seusite.com/artigo-interessante" : "Ex: 5 dicas para emagrecer rápido"} 
+                      placeholder={sourceType === 'link' ? "Ex: https://seusite.com/artigo-interessante" : "Ex: 5 dicas para emagrecer rÃ¡pido"} 
                       className="text-sm p-3 border-gray-200 focus-visible:ring-zinc-900 shadow-sm rounded-lg"
                       value={topic}
                       onChange={(e) => setTopic(e.target.value)}
@@ -297,7 +317,7 @@ export default function GeneradorPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-3">
-                    <Label className="text-gray-900 font-semibold">Formato do Vídeo</Label>
+                    <Label className="text-gray-900 font-semibold">Formato do VÃ­deo</Label>
                     <Select value={format} onValueChange={setFormat}>
                       <SelectTrigger className="border-gray-200 shadow-sm h-12 focus:ring-zinc-900">
                         <span className="flex flex-1 text-left line-clamp-1">{SELECT_LABELS[format]}</span>
@@ -305,15 +325,15 @@ export default function GeneradorPage() {
                       <SelectContent>
                         <SelectItem value="curiosidades">Curiosidades</SelectItem>
                         <SelectItem value="top5">Top 5 / Lista</SelectItem>
-                        <SelectItem value="polemica">Polêmica / Opinião Forte</SelectItem>
-                        <SelectItem value="dicas">Dicas Práticas</SelectItem>
-                        <SelectItem value="historia">História de Sucesso</SelectItem>
-                        <SelectItem value="conspiracao">Teoria da Conspiração</SelectItem>
+                        <SelectItem value="polemica">PolÃªmica / OpiniÃ£o Forte</SelectItem>
+                        <SelectItem value="dicas">Dicas PrÃ¡ticas</SelectItem>
+                        <SelectItem value="historia">HistÃ³ria de Sucesso</SelectItem>
+                        <SelectItem value="conspiracao">Teoria da ConspiraÃ§Ã£o</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-3">
-                    <Label className="text-gray-900 font-semibold">Quantidade de Opções</Label>
+                    <Label className="text-gray-900 font-semibold">Quantidade de OpÃ§Ãµes</Label>
                     <Select value={quantity} onValueChange={setQuantity}>
                       <SelectTrigger className="border-gray-200 shadow-sm h-12 focus:ring-zinc-900">
                         <span className="flex flex-1 text-left line-clamp-1">{SELECT_LABELS[quantity]}</span>
@@ -342,7 +362,7 @@ export default function GeneradorPage() {
                       )}
                     </div>
                     <Label className="text-gray-900 font-semibold cursor-pointer text-base">
-                      Incluir Chamada para Ação (CTA)?
+                      Incluir Chamada para AÃ§Ã£o (CTA)?
                     </Label>
                   </div>
                   
@@ -367,7 +387,7 @@ export default function GeneradorPage() {
                   {isGeneratingBatch ? (
                     <span className="flex items-center"><Loader2 className="h-5 w-5 mr-2 animate-spin" /> Gerando Ideias...</span>
                   ) : (
-                    <span className="flex items-center">Gerar {quantity} Opções <ArrowRight className="ml-2 h-5 w-5" /></span>
+                    <span className="flex items-center">Gerar {quantity} OpÃ§Ãµes <ArrowRight className="ml-2 h-5 w-5" /></span>
                   )}
                 </Button>
               </CardContent>
@@ -375,7 +395,7 @@ export default function GeneradorPage() {
           </div>
         )}
 
-        {/* PASSO 2: SELEÇÃO */}
+        {/* PASSO 2: SELEÃ‡ÃƒO */}
         {currentStep === 2 && (
           <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
             <Card className="border-gray-200 shadow-sm overflow-hidden rounded-xl bg-white">
@@ -383,7 +403,7 @@ export default function GeneradorPage() {
               <CardHeader className="pb-5 border-b border-gray-100 bg-gray-50/50 flex flex-row items-center justify-between">
                 <div>
                   <CardTitle className="text-xl text-gray-900">2. Escolha os Melhores</CardTitle>
-                  <CardDescription className="text-base text-gray-500 mt-1">Selecione e faça ajustes finais nos textos.</CardDescription>
+                  <CardDescription className="text-base text-gray-500 mt-1">Selecione e faÃ§a ajustes finais nos textos.</CardDescription>
                 </div>
                 <Button variant="outline" className="border-gray-200 shadow-sm rounded-xl bg-white" onClick={() => setCurrentStep(1)}>
                   <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
@@ -436,7 +456,7 @@ export default function GeneradorPage() {
                     }}
                     disabled={selectedScripts.length === 0}
                   >
-                    Continuar para Produção ({selectedScripts.length} Selecionados) <ArrowRight className="ml-2 h-5 w-5" />
+                    Continuar para ProduÃ§Ã£o ({selectedScripts.length} Selecionados) <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </div>
               </CardContent>
@@ -444,7 +464,7 @@ export default function GeneradorPage() {
           </div>
         )}
 
-        {/* PASSO 3: CONFIGURAÇÕES E PRODUÇÃO */}
+        {/* PASSO 3: CONFIGURAÃ‡Ã•ES E PRODUÃ‡ÃƒO */}
         {currentStep === 3 && (
           <div className="grid lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="lg:col-span-2">
@@ -452,7 +472,7 @@ export default function GeneradorPage() {
                 <div className="h-1.5 w-full bg-zinc-900"></div>
                 <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-5 flex flex-row items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl text-gray-900">3. Configurações Finais</CardTitle>
+                    <CardTitle className="text-xl text-gray-900">3. ConfiguraÃ§Ãµes Finais</CardTitle>
                     <CardDescription className="text-base text-gray-500 mt-1">Defina voz, legenda e trilha sonora.</CardDescription>
                   </div>
                   <Button variant="outline" className="border-gray-200 shadow-sm rounded-xl bg-white" onClick={() => setCurrentStep(2)}>
@@ -465,7 +485,7 @@ export default function GeneradorPage() {
                       <TabsList className="bg-gray-100 p-1 rounded-lg w-full grid grid-cols-3 !h-auto">
                         <TabsTrigger value="geral" className="rounded-md py-2.5 !h-auto data-active:bg-white data-active:shadow-sm data-active:text-gray-900 text-gray-500 font-medium">Locutor</TabsTrigger>
                         <TabsTrigger value="legenda" className="rounded-md py-2.5 !h-auto data-active:bg-white data-active:shadow-sm data-active:text-gray-900 text-gray-500 font-medium">Legendas</TabsTrigger>
-                        <TabsTrigger value="audio" className="rounded-md py-2.5 !h-auto data-active:bg-white data-active:shadow-sm data-active:text-gray-900 text-gray-500 font-medium">Áudio</TabsTrigger>
+                        <TabsTrigger value="audio" className="rounded-md py-2.5 !h-auto data-active:bg-white data-active:shadow-sm data-active:text-gray-900 text-gray-500 font-medium">Ãudio</TabsTrigger>
                       </TabsList>
                     </div>
                     
@@ -478,15 +498,15 @@ export default function GeneradorPage() {
                               <span className="flex flex-1 text-left line-clamp-1">{SELECT_LABELS[voz]}</span>
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="pt-BR-AntonioNeural">Antônio (Masculino - Forte/Grave)</SelectItem>
-                              <SelectItem value="pt-BR-JulioNeural">Júlio (Masculino - Jovem)</SelectItem>
-                              <SelectItem value="pt-BR-FranciscaNeural">Francisca (Feminina - Enérgica)</SelectItem>
+                              <SelectItem value="pt-BR-AntonioNeural">AntÃ´nio (Masculino - Forte/Grave)</SelectItem>
+                              <SelectItem value="pt-BR-JulioNeural">JÃºlio (Masculino - Jovem)</SelectItem>
+                              <SelectItem value="pt-BR-FranciscaNeural">Francisca (Feminina - EnÃ©rgica)</SelectItem>
                               <SelectItem value="pt-BR-ThalitaNeural">Thalita (Feminina - Suave)</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div className="space-y-3">
-                          <Label className="text-gray-700">Velocidade da Narração</Label>
+                          <Label className="text-gray-700">Velocidade da NarraÃ§Ã£o</Label>
                           <Select value={velocidade} onValueChange={(v) => v && setVelocidade(v)}>
                             <SelectTrigger className="border-gray-200 shadow-sm focus:ring-zinc-900">
                               <span className="flex flex-1 text-left line-clamp-1">{SELECT_LABELS[velocidade]}</span>
@@ -494,8 +514,8 @@ export default function GeneradorPage() {
                             <SelectContent>
                               <SelectItem value="0.9">Lento (0.9x)</SelectItem>
                               <SelectItem value="1.0">Normal (1.0x)</SelectItem>
-                              <SelectItem value="1.15">Dinâmico (1.15x)</SelectItem>
-                              <SelectItem value="1.3">Muito Rápido (1.3x)</SelectItem>
+                              <SelectItem value="1.15">DinÃ¢mico (1.15x)</SelectItem>
+                              <SelectItem value="1.3">Muito RÃ¡pido (1.3x)</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -511,14 +531,14 @@ export default function GeneradorPage() {
                               <span className="flex flex-1 text-left line-clamp-1">{SELECT_LABELS[fonte]}</span>
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Roboto-Black">Roboto Black (Padrão Tiktok)</SelectItem>
+                              <SelectItem value="Roboto-Black">Roboto Black (PadrÃ£o Tiktok)</SelectItem>
                               <SelectItem value="Montserrat-Bold">Montserrat Bold</SelectItem>
-                              <SelectItem value="Impact">Impact (Meme clássico)</SelectItem>
+                              <SelectItem value="Impact">Impact (Meme clÃ¡ssico)</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div className="space-y-3">
-                          <Label className="text-gray-700">Posição na Tela</Label>
+                          <Label className="text-gray-700">PosiÃ§Ã£o na Tela</Label>
                           <Select value={posicaoLegenda} onValueChange={(v) => v && setPosicaoLegenda(v)}>
                             <SelectTrigger className="border-gray-200 shadow-sm focus:ring-zinc-900">
                               <span className="flex flex-1 text-left line-clamp-1">{SELECT_LABELS[posicaoLegenda]}</span>
@@ -526,7 +546,7 @@ export default function GeneradorPage() {
                             <SelectContent>
                               <SelectItem value="top">Topo</SelectItem>
                               <SelectItem value="center">Centro</SelectItem>
-                              <SelectItem value="bottom">Rodapé</SelectItem>
+                              <SelectItem value="bottom">RodapÃ©</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -553,7 +573,7 @@ export default function GeneradorPage() {
                       <div className="space-y-6 bg-gray-50 p-6 rounded-xl border border-gray-100">
                         <div className="flex justify-between items-center">
                           <Label className="text-gray-900 font-semibold text-base">
-                            Volume da Música de Fundo
+                            Volume da MÃºsica de Fundo
                           </Label>
                           <Badge variant="outline" className="text-gray-900 bg-white border-gray-200 shadow-sm px-3 py-1 font-bold text-sm rounded-full">
                             {bgmVolume}%
@@ -578,14 +598,14 @@ export default function GeneradorPage() {
                 <div className="h-1.5 w-full bg-emerald-500"></div>
                 <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-5">
                   <CardTitle className="text-xl text-gray-900">
-                    Resumo e Produção
+                    Resumo e ProduÃ§Ã£o
                   </CardTitle>
                 </CardHeader>
                 
                 <CardContent className="pt-6 space-y-6 relative">
                   <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-4 shadow-sm">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 font-medium">Vídeos para Produzir</span>
+                      <span className="text-sm text-gray-600 font-medium">VÃ­deos para Produzir</span>
                       <Badge variant="secondary" className="bg-white text-gray-900 font-bold border border-gray-200">
                         {selectedScripts.length}
                       </Badge>
@@ -593,14 +613,14 @@ export default function GeneradorPage() {
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 font-medium">Custo Total</span>
                       <Badge variant="secondary" className="bg-white text-gray-900 font-bold border border-gray-200">
-                        {selectedScripts.length * 10} Créditos
+                        {selectedScripts.length * 10} CrÃ©ditos
                       </Badge>
                     </div>
                     <div className="h-px bg-gray-200 w-full"></div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-slate-500 font-medium">Seu Saldo Restante</span>
                       <span className="text-sm font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-md">
-                        {isLoading ? "..." : `${credits} Créditos`}
+                        {isLoading ? "..." : `${credits} CrÃ©ditos`}
                       </span>
                     </div>
                   </div>
@@ -615,7 +635,7 @@ export default function GeneradorPage() {
                       {isFilaLoading ? "Enviando..." : `Colocar ${selectedScripts.length} na Fila`}
                     </Button>
                     <p className="text-center text-xs text-gray-400 mt-4 font-medium flex items-center justify-center gap-1">
-                      Tempo estimado: <span className="text-gray-900 font-semibold">~{Math.max(2, selectedScripts.length * 1.5)} minutos</span>
+                      Tempo estimado: <span className="text-gray-900 font-semibold">~{Math.max(5, selectedScripts.length * 4)} minutos</span>
                     </p>
                   </div>
                 </CardContent>
@@ -628,3 +648,4 @@ export default function GeneradorPage() {
     </div>
   )
 }
+

@@ -131,43 +131,71 @@ export default function ConfiguracoesPage() {
   }
 
   const handleScrapeUrl = async () => {
-    if (!importUrl) return
-    setIsScraping(true)
-    try {
-      const res = await fetch('/api/read-site-context', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: importUrl })
-      })
-      
-      const data = await res.json()
-      
-      if (!res.ok) {
-        let errorMsg = data.error || 'Falha ao ler o site'
-        if (typeof errorMsg === 'string' && errorMsg.includes('Quota exceeded')) {
-          errorMsg = 'A IA está sobrecarregada no momento (limite atingido). Tente novamente em alguns minutos.'
+    if (!importUrl) return;
+    setIsScraping(true);
+    
+    let retries = 0;
+    const maxRetries = 6;
+    let delay = 3000;
+
+    while (retries <= maxRetries) {
+      try {
+        if (retries > 0) {
+          setMessageType("success");
+          setMessage(`Fila de espera... A IA está ocupada. Tentando novamente (${retries}/${maxRetries}).`);
         }
-        setMessageType("error")
-        setMessage(errorMsg)
-        return
+
+        const res = await fetch('/api/read-site-context', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: importUrl })
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+          if (data.error === 'RATE_LIMIT' || res.status === 429) {
+            if (retries < maxRetries) {
+              retries++;
+              await new Promise(r => setTimeout(r, delay));
+              delay += 2000; // aumenta a espera a cada tentativa
+              continue; 
+            } else {
+              setMessageType("error");
+              setMessage("A IA está muito congestionada no momento. Tente novamente em 1 minuto.");
+              setIsScraping(false);
+              setTimeout(() => setMessage(""), 5000);
+              return;
+            }
+          }
+
+          let errorMsg = data.error || 'Falha ao ler o site';
+          setMessageType("error");
+          setMessage(errorMsg);
+          setIsScraping(false);
+          setTimeout(() => setMessage(""), 5000);
+          return;
+        }
+        
+        setFormData({
+          product_name: data.nomeProduto || "",
+          target_audience: data.publico || "",
+          main_benefit: data.beneficio || "",
+          price: data.preco || ""
+        });
+        setMessageType("success");
+        setMessage("Site lido com sucesso! Revise e salve as configurações.");
+        break;
+      } catch (e: any) {
+        console.error(e);
+        setMessageType("error");
+        setMessage(e.message || 'Erro ao extrair site');
+        break;
       }
-      
-      setFormData({
-        product_name: data.nomeProduto || "",
-        target_audience: data.publico || "",
-        main_benefit: data.beneficio || "",
-        price: data.preco || ""
-      })
-      setMessageType("success")
-      setMessage("Site lido com sucesso! Revise e salve as configurações.")
-    } catch (e: any) {
-      console.error(e)
-      setMessageType("error")
-      setMessage(e.message || 'Erro ao extrair site')
-    } finally {
-      setIsScraping(false)
-      setTimeout(() => setMessage(""), 5000)
     }
+    
+    setIsScraping(false);
+    setTimeout(() => setMessage(""), 5000);
   }
 
   return (

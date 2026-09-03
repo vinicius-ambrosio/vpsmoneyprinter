@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 import { generateObject } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { z } from 'zod';
 
 export async function POST(req: Request) {
@@ -12,18 +12,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
-    if (!process.env.MOONSHOT_API_KEY) {
-      return NextResponse.json({ error: 'Chave da API da Kimi não configurada (MOONSHOT_API_KEY no arquivo .env.local).' }, { status: 500 });
+    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+      return NextResponse.json({ error: 'Chave da API do Google não configurada (GOOGLE_GENERATIVE_AI_API_KEY no arquivo .env.local).' }, { status: 500 });
     }
 
-    const moonshot = createOpenAI({
-      baseURL: 'https://api.moonshot.ai/v1',
-      apiKey: process.env.MOONSHOT_API_KEY,
+    const google = createGoogleGenerativeAI({
+      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
     });
 
-    let targetUrl = url;
-    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+    let targetUrl = url.trim();
+    if (!targetUrl.match(/^https?:\/\//i)) {
       targetUrl = 'https://' + targetUrl;
+    }
+
+    try {
+      new URL(targetUrl);
+    } catch (e) {
+      return NextResponse.json({ error: 'Formato de URL inválido.' }, { status: 400 });
     }
 
     let textContent = '';
@@ -65,7 +70,7 @@ export async function POST(req: Request) {
     }
 
     const { object } = await generateObject({
-      model: moonshot('kimi-k2.6'),
+      model: google('gemini-3.6-flash'),
       schema: z.object({
         nomeProduto: z.string().describe("O nome completo do produto, serviço ou empresa, junto com uma breve descrição do que ele é. (Ex: 'OdontoProfit - Software de Precificação Inteligente para Clínicas Odontológicas')"),
         publico: z.string().describe("Descreva detalhadamente o público-alvo, incluindo suas principais dores, desejos e frustrações atuais. Escreva pelo menos 2 a 3 frases densas. (Ex: 'Dentistas e donos de clínicas que têm dificuldade em precificar seus serviços, vivem no escuro em relação ao lucro real e estão cansados de cobrar barato por medo de perder o paciente.')"),
@@ -85,6 +90,10 @@ ${textContent}`
 
     return NextResponse.json(object);
   } catch (error: any) {
+    const errorString = error?.message?.toLowerCase() || '';
+    if (errorString.includes('429') || errorString.includes('rate limit') || errorString.includes('concurrency') || errorString.includes('too many requests') || errorString.includes('quota')) {
+      return NextResponse.json({ error: 'RATE_LIMIT' }, { status: 429 });
+    }
     return NextResponse.json({ error: error.message || 'Erro ao ler site' }, { status: 500 });
   }
 }

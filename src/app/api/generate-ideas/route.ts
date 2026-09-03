@@ -89,7 +89,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json(object);
   } catch (error: any) {
-    console.error('Error generating ideas:', error);
-    return NextResponse.json({ error: error.message || 'Erro ao processar a requisição' }, { status: 500 });
+    const errorString = error?.message?.toLowerCase() || '';
+    if (errorString.includes('429') || errorString.includes('rate limit') || errorString.includes('concurrency') || errorString.includes('too many requests') || errorString.includes('quota')) {
+      return NextResponse.json({ error: 'RATE_LIMIT' }, { status: 429 });
+    }
+    return NextResponse.json({ error: error.message || 'Erro interno.' }, { status: 500 });
   }
 }
