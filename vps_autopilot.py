@@ -109,6 +109,8 @@ def wait_for_task(task_id):
                 return None
             elif state == 1:
                 logger.info(f"Tarefa {task_id} em andamento ({progress}%)...")
+            elif state == 0:
+                logger.info(f"Tarefa {task_id} na fila/preparando...")
         except Exception as e:
             logger.error(f"Erro ao consultar status da tarefa {task_id}: {e}")
         time.sleep(10)
@@ -183,5 +185,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
