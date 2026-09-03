@@ -29,22 +29,45 @@ export async function POST(req: Request) {
     const transaction = body.data?.purchase?.transaction || body.transaction
     const amountPaid = body.data?.purchase?.price?.value || body.price || 0
     
-    if (!email) {
-      return NextResponse.json({ error: 'Email not found in payload' }, { status: 400 })
+    // O `xcod` enviado na URL do checkout chega aqui
+    const userIdFromTracking = body.data?.tracking?.checkout_custom_source || body.xcod
+    
+    if (!email && !userIdFromTracking) {
+      return NextResponse.json({ error: 'Email or User ID not found in payload' }, { status: 400 })
     }
 
     const supabase = createAdminClient()
 
-    // Buscar usuário
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .single()
+    let userData = null;
+    let userError = null;
+
+    // 1. Tentar buscar pelo ID do usuário (se foi passado no link como ?xcod=ID)
+    if (userIdFromTracking) {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userIdFromTracking)
+        .single()
+      
+      userData = data;
+      userError = error;
+    }
+
+    // 2. Se não encontrou pelo ID (ou não veio o xcod), fazer fallback para buscar por E-mail
+    if (!userData && email) {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single()
+      
+      userData = data;
+      userError = error;
+    }
 
     if (userError || !userData) {
-      console.error(`Usuário não encontrado para o email: ${email}`)
-      return NextResponse.json({ message: 'User not found for this email. Credits not added.' }, { status: 200 })
+      console.error(`Usuário não encontrado para E-mail (${email}) ou ID (${userIdFromTracking})`)
+      return NextResponse.json({ message: 'User not found. Credits not added.' }, { status: 200 })
     }
 
     // Identificar o ID do produto da Hotmart

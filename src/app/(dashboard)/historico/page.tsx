@@ -43,8 +43,8 @@ export default async function HistoricoPage() {
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Meus VÃ­deos</h1>
-        <p className="text-gray-500 mt-2">Acompanhe a fila de processamento e baixe seus vÃ­deos prontos.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Meus Vídeos</h1>
+        <p className="text-gray-500 mt-2">Acompanhe a fila de processamento e baixe seus vídeos prontos.</p>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -55,7 +55,7 @@ export default async function HistoricoPage() {
               <TableHead className="text-gray-600 font-semibold">Estilo</TableHead>
               <TableHead className="text-gray-600 font-semibold">Data</TableHead>
               <TableHead className="text-gray-600 font-semibold">Status</TableHead>
-              <TableHead className="text-right text-gray-600 font-semibold">AÃ§Ãµes</TableHead>
+              <TableHead className="text-right text-gray-600 font-semibold">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -63,7 +63,7 @@ export default async function HistoricoPage() {
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-12 text-gray-500">
                   <VideoIcon className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                  Nenhum vÃ­deo criado ainda. VÃ¡ para a pÃ¡gina inicial para gerar seu primeiro gancho!
+                  Nenhum vídeo criado ainda. Vá para a página inicial para gerar seu primeiro gancho!
                 </TableCell>
               </TableRow>
             ) : (

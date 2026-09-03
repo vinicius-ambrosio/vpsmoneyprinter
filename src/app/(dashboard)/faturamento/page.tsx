@@ -82,13 +82,23 @@ export default function FaturamentoPage() {
     }
   ]
 
-  const handlePurchase = async (pkgId: string) => {
+  const handlePurchase = async (pkg: typeof packages[0]) => {
     setIsPurchasing(true)
-    // Aqui seria feita a integração com o Stripe
-    setTimeout(() => {
-      alert(`Redirecionando para o checkout do pacote ${pkgId}...`)
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      let finalUrl = pkg.hotmartLink
+      if (user) {
+        // Redundância necessária: enviamos o user.id pelo xcod para resgatar no Webhook
+        finalUrl += `&xcod=${user.id}`
+      }
+      
+      window.location.href = finalUrl
+    } catch (error) {
+      console.error(error)
       setIsPurchasing(false)
-    }, 1000)
+    }
   }
 
   return (
@@ -181,7 +191,7 @@ export default function FaturamentoPage() {
               <CardFooter>
                 <Button 
                   className={`w-full gap-2 rounded-lg font-semibold ${pkg.popular ? 'bg-black hover:bg-zinc-800 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-900'}`}
-                  onClick={() => handlePurchase(pkg.id)}
+                  onClick={() => handlePurchase(pkg)}
                   disabled={isPurchasing}
                 >
                   Comprar {pkg.name} <ArrowRight className="h-4 w-4" />
