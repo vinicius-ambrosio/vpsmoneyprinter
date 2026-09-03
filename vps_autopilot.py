@@ -168,7 +168,7 @@ def main():
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
         while True:
             try:
-                response = requests.get(f"{SUPABASE_URL}/rest/v1/videos?status=eq.draft&select=*&limit=3", headers=HEADERS)
+                response = requests.get(f"{SUPABASE_URL}/rest/v1/videos?status=eq.draft&select=*&order=created_at.asc&limit=3", headers=HEADERS)
                 response.raise_for_status()
                 videos = response.json()
                 
@@ -193,6 +193,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
