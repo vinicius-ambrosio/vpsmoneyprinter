@@ -219,7 +219,7 @@ export default function GeneradorPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-12">
-      <div className="bg-white border-b border-gray-200 px-6 py-4 mb-6">
+      <div className="bg-white border-b border-gray-200 px-6 pt-10 pb-4 md:pt-4 mb-6 md:mb-8">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 bg-zinc-900 rounded-xl flex items-center justify-center shadow-sm shrink-0">
@@ -266,177 +266,181 @@ export default function GeneradorPage() {
         {/* PASSO 1: GERAR IDEIAS */}
         {currentStep === 1 && (
           <div className="max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <Card className="border-gray-200 shadow-sm overflow-hidden rounded-xl bg-white">
-              <div className="h-1.5 w-full bg-zinc-900"></div>
-              <CardHeader className="pb-5 border-b border-gray-100 bg-gray-50/50">
-                <CardTitle className="text-xl text-gray-900">1. Tema e Formato</CardTitle>
-                <CardDescription className="text-base text-gray-500 mt-1">Forneça um contexto para a IA criar as opções.</CardDescription>
+            <Card className="border-gray-200 shadow-md overflow-hidden rounded-2xl bg-white">
+              <div className="h-2 w-full bg-zinc-900"></div>
+              <CardHeader className="pb-6 pt-8 px-6 md:px-8 border-b border-gray-100 bg-white">
+                <CardTitle className="text-2xl font-black text-gray-900 tracking-tight">1. Tema e Formato</CardTitle>
+                <CardDescription className="text-base font-medium text-gray-500 mt-2">
+                  Forneça um contexto para a IA criar as opções de roteiro.
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-5 pt-6 pb-6 px-6">
+              <CardContent className="space-y-8 pt-8 pb-8 px-6 md:px-8 bg-white">
                 
-                <div className="space-y-3">
-                  <Label className="text-gray-900 font-semibold text-sm">Fonte do Conteúdo</Label>
+                <div className="space-y-4">
+                  <Label className="text-gray-900 font-bold text-base">Fonte do Conteúdo</Label>
                   <div className="grid grid-cols-3 gap-3">
                     <div 
-                      className={`border-2 rounded-xl p-3 cursor-pointer transition-all flex items-center justify-center gap-2 ${sourceType === 'link' ? 'border-zinc-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                      className={`border-2 rounded-2xl p-4 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center ${sourceType === 'link' ? 'border-zinc-900 bg-zinc-50' : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'}`}
                       onClick={() => setSourceType('link')}
                     >
-                      <Link2 className={`h-4 w-4 ${sourceType === 'link' ? 'text-zinc-900' : 'text-gray-500'}`} />
-                      <span className={`font-bold text-sm ${sourceType === 'link' ? 'text-zinc-900' : 'text-gray-700'}`}>Link</span>
+                      <Link2 className={`h-6 w-6 ${sourceType === 'link' ? 'text-zinc-900' : 'text-gray-400'}`} />
+                      <span className={`font-bold text-sm ${sourceType === 'link' ? 'text-zinc-900' : 'text-gray-600'}`}>Link</span>
                     </div>
                     
                     <div 
-                      className={`border-2 rounded-xl p-3 cursor-pointer transition-all flex items-center justify-center gap-2 ${sourceType === 'tema' ? 'border-zinc-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                      className={`border-2 rounded-2xl p-4 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center ${sourceType === 'tema' ? 'border-zinc-900 bg-zinc-50' : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'}`}
                       onClick={() => setSourceType('tema')}
                     >
-                      <Type className={`h-4 w-4 ${sourceType === 'tema' ? 'text-zinc-900' : 'text-gray-500'}`} />
-                      <span className={`font-bold text-sm ${sourceType === 'tema' ? 'text-zinc-900' : 'text-gray-700'}`}>Tema livre</span>
+                      <Type className={`h-6 w-6 ${sourceType === 'tema' ? 'text-zinc-900' : 'text-gray-400'}`} />
+                      <span className={`font-bold text-sm ${sourceType === 'tema' ? 'text-zinc-900' : 'text-gray-600'}`}>Tema livre</span>
                     </div>
 
                     <div 
-                      className={`border-2 rounded-xl p-3 cursor-pointer transition-all flex items-center justify-center gap-2 ${sourceType === 'brand' ? 'border-zinc-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                      className={`border-2 rounded-2xl p-4 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center ${sourceType === 'brand' ? 'border-zinc-900 bg-zinc-50' : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'}`}
                       onClick={() => setSourceType('brand')}
                     >
-                      <Building2 className={`h-4 w-4 ${sourceType === 'brand' ? 'text-zinc-900' : 'text-gray-500'}`} />
-                      <span className={`font-bold text-sm ${sourceType === 'brand' ? 'text-zinc-900' : 'text-gray-700'}`}>Meu Produto</span>
+                      <Building2 className={`h-6 w-6 ${sourceType === 'brand' ? 'text-zinc-900' : 'text-gray-400'}`} />
+                      <span className={`font-bold text-sm ${sourceType === 'brand' ? 'text-zinc-900' : 'text-gray-600'}`}>Meu Produto</span>
                     </div>
                   </div>
                 </div>
 
                 {(sourceType === 'link' || sourceType === 'tema') && (
-                  <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <Label className="text-gray-900 font-semibold text-sm">{sourceType === 'link' ? 'Link de Referência' : 'Tema do Vídeo'}</Label>
+                  <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <Label className="text-gray-900 font-bold text-base">{sourceType === 'link' ? 'Link de Referência' : 'Tema do Vídeo'}</Label>
                     <Input 
                       placeholder={sourceType === 'link' ? "Ex: https://seusite.com/artigo-interessante" : "Ex: 5 dicas para emagrecer rápido"} 
-                      className="text-sm p-3 border-gray-200 focus-visible:ring-zinc-900 shadow-sm rounded-lg"
+                      className="text-base p-4 h-14 border-2 border-gray-200 focus-visible:ring-0 focus-visible:border-zinc-900 shadow-sm rounded-xl bg-gray-50 transition-colors"
                       value={topic}
                       onChange={(e) => setTopic(e.target.value)}
                     />
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
-                    <Label className="text-gray-900 font-semibold">Formato do Vídeo</Label>
+                    <Label className="text-gray-900 font-bold text-base">Formato do Vídeo</Label>
                     <Select value={format} onValueChange={setFormat}>
-                      <SelectTrigger className="border-gray-200 shadow-sm h-12 focus:ring-zinc-900">
-                        <span className="flex flex-1 text-left line-clamp-1">{SELECT_LABELS[format]}</span>
+                      <SelectTrigger className="border-2 border-gray-200 shadow-sm h-14 rounded-xl focus:ring-0 focus:border-zinc-900 bg-gray-50 transition-colors text-base font-medium">
+                        <span className="flex flex-1 text-left line-clamp-1 text-gray-900">{SELECT_LABELS[format]}</span>
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="curiosidades">Curiosidades</SelectItem>
-                        <SelectItem value="top5">Top 5 / Lista</SelectItem>
-                        <SelectItem value="polemica">Polêmica / Opinião Forte</SelectItem>
-                        <SelectItem value="dicas">Dicas Práticas</SelectItem>
-                        <SelectItem value="historia">História de Sucesso</SelectItem>
-                        <SelectItem value="conspiracao">Teoria da Conspiração</SelectItem>
+                      <SelectContent className="rounded-xl border-gray-200 shadow-lg">
+                        <SelectItem value="curiosidades" className="font-medium">Curiosidades</SelectItem>
+                        <SelectItem value="top5" className="font-medium">Top 5 / Lista</SelectItem>
+                        <SelectItem value="polemica" className="font-medium">Polêmica / Opinião Forte</SelectItem>
+                        <SelectItem value="dicas" className="font-medium">Dicas Práticas</SelectItem>
+                        <SelectItem value="historia" className="font-medium">História de Sucesso</SelectItem>
+                        <SelectItem value="conspiracao" className="font-medium">Teoria da Conspiração</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-3">
-                    <Label className="text-gray-900 font-semibold">Quantidade de Opções</Label>
+                    <Label className="text-gray-900 font-bold text-base">Quantidade de Opções</Label>
                     <Select value={quantity} onValueChange={setQuantity}>
-                      <SelectTrigger className="border-gray-200 shadow-sm h-12 focus:ring-zinc-900">
-                        <span className="flex flex-1 text-left line-clamp-1">{SELECT_LABELS[quantity]}</span>
+                      <SelectTrigger className="border-2 border-gray-200 shadow-sm h-14 rounded-xl focus:ring-0 focus:border-zinc-900 bg-gray-50 transition-colors text-base font-medium">
+                        <span className="flex flex-1 text-left line-clamp-1 text-gray-900">{SELECT_LABELS[quantity]}</span>
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1 Roteiro</SelectItem>
-                        <SelectItem value="2">2 Roteiros</SelectItem>
-                        <SelectItem value="3">3 Roteiros</SelectItem>
-                        <SelectItem value="4">4 Roteiros</SelectItem>
-                        <SelectItem value="5">5 Roteiros</SelectItem>
+                      <SelectContent className="rounded-xl border-gray-200 shadow-lg">
+                        <SelectItem value="1" className="font-medium">1 Roteiro</SelectItem>
+                        <SelectItem value="2" className="font-medium">2 Roteiros</SelectItem>
+                        <SelectItem value="3" className="font-medium">3 Roteiros</SelectItem>
+                        <SelectItem value="4" className="font-medium">4 Roteiros</SelectItem>
+                        <SelectItem value="5" className="font-medium">5 Roteiros</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
-                <div className="space-y-3 pt-3 border-t border-gray-100 mt-2">
+                <div className="space-y-4 pt-6 border-t border-gray-100">
                   <div 
-                    className="flex items-center gap-3 cursor-pointer select-none"
+                    className="flex items-center gap-3 cursor-pointer select-none group inline-flex"
                     onClick={() => setHasCta(!hasCta)}
                   >
-                    <div className="pt-0.5">
+                    <div className="flex-shrink-0 transition-transform group-active:scale-95">
                       {hasCta ? (
-                        <CheckCircle className="h-5 w-5 text-zinc-900" />
+                        <CheckCircle className="h-7 w-7 text-green-600 fill-green-100" />
                       ) : (
-                        <Circle className="h-5 w-5 text-gray-300" />
+                        <Circle className="h-7 w-7 text-gray-300 group-hover:text-gray-400 transition-colors" />
                       )}
                     </div>
-                    <Label className="text-gray-900 font-semibold cursor-pointer text-base">
+                    <Label className="text-gray-900 font-bold cursor-pointer text-base select-none">
                       Incluir Chamada para Ação (CTA)?
                     </Label>
                   </div>
                   
                   {hasCta && (
-                    <div className="space-y-3 pl-8 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="space-y-3 pl-10 animate-in fade-in slide-in-from-top-2 duration-300">
                       <Input 
                         placeholder="Ex: Curta e comente 'EU QUERO', ou Clique no link da bio..." 
-                        className="text-sm p-3 border-gray-200 focus-visible:ring-zinc-900 shadow-sm rounded-lg"
+                        className="text-base p-4 h-14 border-2 border-gray-200 focus-visible:ring-0 focus-visible:border-zinc-900 shadow-sm rounded-xl bg-gray-50 transition-colors"
                         value={cta}
                         onChange={(e) => setCta(e.target.value)}
                       />
-                      <p className="text-xs text-gray-500">A IA vai incorporar essa chamada no final dos roteiros.</p>
+                      <p className="text-sm font-medium text-gray-500">A IA vai incorporar essa chamada no final dos roteiros.</p>
                     </div>
                   )}
                 </div>
 
-                <Button 
-                  className="w-full h-12 bg-black hover:bg-zinc-800 text-white shadow-sm text-base font-bold transition-all rounded-xl mt-2"
-                  onClick={handleGerarLote}
-                  disabled={isGeneratingBatch}
-                >
-                  {isGeneratingBatch ? (
-                    <span className="flex items-center"><Loader2 className="h-5 w-5 mr-2 animate-spin" /> Gerando Ideias...</span>
-                  ) : (
-                    <span className="flex items-center">Gerar {quantity} Opções <ArrowRight className="ml-2 h-5 w-5" /></span>
-                  )}
-                </Button>
+                <div className="pt-4">
+                  <Button 
+                    className="w-full h-16 bg-black hover:bg-zinc-800 text-white shadow-md text-lg font-bold transition-all rounded-2xl active:scale-[0.98]"
+                    onClick={handleGerarLote}
+                    disabled={isGeneratingBatch}
+                  >
+                    {isGeneratingBatch ? (
+                      <span className="flex items-center gap-2"><Loader2 className="h-6 w-6 animate-spin" /> Gerando Ideias...</span>
+                    ) : (
+                      <span className="flex items-center gap-2">Gerar {quantity} Opções <ArrowRight className="h-6 w-6" /></span>
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* PASSO 2: SELE!ÒO */}
+        {/* PASSO 2: SELEÇÃO */}
         {currentStep === 2 && (
           <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <Card className="border-gray-200 shadow-sm overflow-hidden rounded-xl bg-white">
-              <div className="h-1.5 w-full bg-zinc-900"></div>
-              <CardHeader className="pb-5 border-b border-gray-100 bg-gray-50/50 flex flex-row items-center justify-between">
+            <Card className="border-gray-200 shadow-md overflow-hidden rounded-2xl bg-white">
+              <div className="h-2 w-full bg-zinc-900"></div>
+              <CardHeader className="pb-6 pt-8 px-6 md:px-8 border-b border-gray-100 bg-white flex flex-col md:flex-row md:items-start justify-between gap-4">
                 <div>
-                  <CardTitle className="text-xl text-gray-900">2. Escolha os Melhores</CardTitle>
-                  <CardDescription className="text-base text-gray-500 mt-1">Selecione e faça ajustes finais nos textos.</CardDescription>
+                  <CardTitle className="text-2xl font-black text-gray-900 tracking-tight">2. Escolha os Melhores</CardTitle>
+                  <CardDescription className="text-base font-medium text-gray-500 mt-2">Selecione e faça ajustes finais nos textos.</CardDescription>
                 </div>
-                <Button variant="outline" className="border-gray-200 shadow-sm rounded-xl bg-white" onClick={() => setCurrentStep(1)}>
-                  <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
+                <Button variant="outline" className="border-2 border-gray-200 shadow-sm rounded-xl bg-white hover:bg-gray-50 text-gray-900 font-bold h-12 px-4" onClick={() => setCurrentStep(1)}>
+                  <ArrowLeft className="mr-2 h-5 w-5" /> Voltar
                 </Button>
               </CardHeader>
-              <CardContent className="p-6 bg-gray-50/30">
+              <CardContent className="p-6 md:p-8 bg-gray-50/50">
                 <div className="grid md:grid-cols-2 gap-6">
                   {generatedOptions.map((option, index) => {
                     const isSelected = selectedScripts.includes(index);
                     return (
                       <div 
                         key={index} 
-                        className={`relative rounded-xl border-2 transition-all overflow-hidden flex flex-col ${isSelected ? 'border-zinc-900 bg-white shadow-md' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                        className={`relative rounded-2xl border-2 transition-all overflow-hidden flex flex-col ${isSelected ? 'border-zinc-900 bg-white shadow-lg scale-[1.01]' : 'border-gray-200 bg-white hover:border-gray-300'}`}
                       >
                         <div 
-                          className={`p-4 flex items-start gap-4 cursor-pointer transition-colors ${isSelected ? 'bg-gray-50' : 'bg-white'}`}
+                          className={`p-5 flex items-start gap-4 cursor-pointer transition-colors ${isSelected ? 'bg-zinc-50' : 'bg-white'}`}
                           onClick={() => toggleSelection(index)}
                         >
-                          <div className="pt-1">
+                          <div className="pt-0.5">
                             {isSelected ? (
-                              <CheckCircle className="h-6 w-6 text-zinc-900 fill-zinc-900/10" />
+                              <CheckCircle className="h-7 w-7 text-zinc-900 fill-zinc-200" />
                             ) : (
-                              <Circle className="h-6 w-6 text-gray-300" />
+                              <Circle className="h-7 w-7 text-gray-300" />
                             )}
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-bold text-gray-900 text-lg mb-1 line-clamp-2">{option.title}</h3>
+                            <h3 className="font-bold text-gray-900 text-lg mb-1 leading-tight">{option.title}</h3>
                           </div>
                         </div>
                         
-                        <div className="px-4 pb-4 flex-1 flex flex-col bg-white">
+                        <div className="px-5 pb-5 flex-1 flex flex-col bg-white">
                           <Textarea 
-                            className="flex-1 min-h-[160px] resize-y text-sm p-3 border-gray-200 focus-visible:ring-zinc-900 shadow-sm rounded-lg bg-white"
+                            className="flex-1 min-h-[200px] resize-y text-base p-4 border-2 border-gray-200 focus-visible:ring-0 focus-visible:border-zinc-900 shadow-sm rounded-xl bg-gray-50 transition-colors"
                             value={option.script}
                             onChange={(e) => handleUpdateScript(index, e.target.value)}
                             onClick={(e) => e.stopPropagation()}
@@ -447,16 +451,19 @@ export default function GeneradorPage() {
                   })}
                 </div>
 
-                <div className="flex justify-end pt-6 mt-6 border-t border-gray-200">
+                <div className="flex flex-col md:flex-row justify-end pt-8 mt-8 border-t border-gray-200">
                   <Button 
                     size="lg"
-                    className={`h-14 shadow-sm text-lg font-bold transition-all rounded-xl px-8 ${selectedScripts.length > 0 ? 'bg-black hover:bg-zinc-800 text-white' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                    className={`h-16 w-full md:w-auto shadow-md text-lg font-bold transition-all rounded-2xl px-8 ${selectedScripts.length > 0 ? 'bg-black hover:bg-zinc-800 text-white active:scale-[0.98]' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
                     onClick={() => {
                       if (selectedScripts.length > 0) setCurrentStep(3);
                     }}
                     disabled={selectedScripts.length === 0}
                   >
-                    Continuar para Produção ({selectedScripts.length} Selecionados) <ArrowRight className="ml-2 h-5 w-5" />
+                    <span className="hidden md:inline">Continuar para Produção</span>
+                    <span className="md:hidden">Produzir</span>
+                    <span className="ml-1">({selectedScripts.length})</span> 
+                    <ArrowRight className="ml-2 h-6 w-6" />
                   </Button>
                 </div>
               </CardContent>

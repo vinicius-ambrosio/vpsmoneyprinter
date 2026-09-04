@@ -28,7 +28,7 @@ export async function produceVideos(videosToInsert: Record<string, unknown>[]) {
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   
   if (authError || !user) {
-    return { error: "Usuário não autenticado" }
+    return { error: "Erro auth: " + (authError?.message || 'Sem usuario') }
   }
 
   // Cost per video is 10
@@ -81,7 +81,7 @@ export async function deleteVideo(videoId: string) {
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   
   if (authError || !user) {
-    return { error: "Usuário não autenticado" }
+    return { error: "Erro auth: " + (authError?.message || 'Sem usuario') }
   }
 
   const { error } = await supabase
@@ -120,3 +120,4 @@ export async function retryVideo(videoId: string) {
   revalidatePath('/historico');
   return { success: true }
 }
+
