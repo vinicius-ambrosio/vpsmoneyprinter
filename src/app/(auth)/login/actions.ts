@@ -39,6 +39,7 @@ export async function signup(formData: FormData) {
     const password = formData.get('password') as string
     const name = formData.get('name') as string
 
+    const adminSupabase = await import('@/utils/supabase/admin').then(m => m.createAdminClient());
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -55,7 +56,7 @@ export async function signup(formData: FormData) {
 
     // Create user row with 20 credits
     if (data?.user) {
-      await supabase.from('users').upsert({
+      await adminSupabase.from('users').upsert({
         id: data.user.id,
         email: email,
         full_name: name,
@@ -86,4 +87,5 @@ export async function logout() {
   revalidatePath('/', 'layout')
   redirect('/login')
 }
+
 
