@@ -70,6 +70,7 @@ def generate_video(video):
         "video_language": "pt-BR",
         "voice_name": video.get("voice_id", "pt-BR-AntonioNeural"),
         "voice_volume": 1.0,
+        "voice_rate": video.get("voice_speed", 1.0),
         "bgm_type": "random",
         "bgm_volume": video.get("bgm_volume", 15) / 100.0,
         "subtitle_enabled": True,
