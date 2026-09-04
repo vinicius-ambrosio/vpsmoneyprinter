@@ -163,6 +163,17 @@ def process_video(video):
             update_video_status(video_id, "completed", video_url=r2_url)
         else:
             update_video_status(video_id, "failed")
+            
+        # Limpar os arquivos locais gerados (mp4, áudios, legendas) para não encher o disco da VPS
+        import shutil
+        task_dir = os.path.join("./storage/tasks", task_id)
+        if os.path.exists(task_dir):
+            try:
+                shutil.rmtree(task_dir)
+                logger.info(f"Arquivos temporarios da tarefa {task_id} removidos com sucesso.")
+            except Exception as e:
+                logger.error(f"Erro ao remover diretorio temporario {task_dir}: {e}")
+
     else:
         update_video_status(video_id, "failed")
 
