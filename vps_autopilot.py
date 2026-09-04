@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import os
 import json
 import time
@@ -62,22 +62,25 @@ def update_video_status(video_id, status, video_url=None):
     except Exception as e:
         logger.error(f"Erro ao atualizar status do video {video_id}: {e}")
 
-def generate_video(script_text, title):
+def generate_video(video):
     logger.info("Enviando requisicao de geracao de video para MoneyPrinterTurbo...")
     payload = {
-        "video_subject": title,
-        "video_script": script_text,
+        "video_subject": video.get("title", ""),
+        "video_script": video.get("script", ""),
         "video_language": "pt-BR",
-        "voice_name": "pt-BR-AntonioNeural",
+        "voice_name": video.get("voice_id", "pt-BR-AntonioNeural"),
         "voice_volume": 1.0,
         "bgm_type": "random",
-        "bgm_volume": 0.2,
+        "bgm_volume": video.get("bgm_volume", 15) / 100.0,
         "subtitle_enabled": True,
-        "subtitle_position": "center",
+        "subtitle_position": video.get("subtitle_position", "center"),
         "video_source": "pexels",
         "video_concat_mode": "random",
         "video_aspect": "9:16",
-        "video_clip_duration": 5
+        "video_clip_duration": 5,
+        "font_name": (video.get("subtitle_font") + ".ttf") if video.get("subtitle_font") else "STHeitiMedium.ttc",
+        "text_fore_color": video.get("subtitle_color", "#FFFFFF"),
+        "text_background_color": video.get("subtitle_bg_color") if video.get("subtitle_bg_color") and video.get("subtitle_bg_color") != "transparent" else False
     }
     try:
         response = requests.post(MONEY_PRINTER_API_VIDEOS, json=payload)
@@ -139,7 +142,7 @@ def process_video(video):
 
     logger.info(f"Processando video ID: {video_id} - Titulo: {title}")
     
-    task_id = generate_video(script, title)
+    task_id = generate_video(video)
     if not task_id:
         update_video_status(video_id, "failed")
         return
@@ -197,6 +200,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
