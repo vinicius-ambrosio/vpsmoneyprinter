@@ -8,9 +8,9 @@ export default function DashboardLayout({
 }>) {
   return (
     <CreditsProvider>
-      <div className="flex w-full h-screen overflow-hidden">
+      <div className="flex w-full h-screen overflow-hidden flex-col md:flex-row">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto bg-white m-4 rounded-2xl border border-gray-200 shadow-sm">
+        <main className="flex-1 overflow-y-auto bg-white md:m-4 md:rounded-2xl md:border border-gray-200 shadow-sm relative">
           {children}
         </main>
       </div>

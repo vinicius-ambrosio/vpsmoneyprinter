@@ -1,4 +1,4 @@
-﻿import { Download, Clock, Loader2, CheckCircle2, Play, Trash2, VideoIcon, XCircle } from "lucide-react"
+import { Download, Clock, Loader2, CheckCircle2, Play, Trash2, VideoIcon, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -78,7 +78,7 @@ export default async function HistoricoPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm text-gray-500 capitalize">{video.style || 'AutomÃ¡tico'}</span>
+                    <span className="text-sm text-gray-500 capitalize">{video.style || 'Automático'}</span>
                   </TableCell>
                   <TableCell>
                     <span className="text-sm text-gray-500">{formatData(video.created_at)}</span>
